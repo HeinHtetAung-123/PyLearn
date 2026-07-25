@@ -1,13 +1,16 @@
 package com.example.pylearn.navigation
 
-/**
- * Defines the navigation destinations currently available in PyLearn.
- */
 sealed class AppDestination(val route: String) {
 
     data object Landing : AppDestination("landing")
 
-    data object Activity : AppDestination("activity")
+    data object Activity : AppDestination("activity/{topicId}") {
+        const val TOPIC_ID_ARGUMENT = "topicId"
+
+        fun createRoute(topicId: String): String {
+            return "activity/$topicId"
+        }
+    }
 
     data object Statistics : AppDestination("statistics")
 

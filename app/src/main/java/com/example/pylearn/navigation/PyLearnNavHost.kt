@@ -13,6 +13,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import com.example.pylearn.ui.landing.LandingViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.pylearn.ui.activity.ActivityViewModel
 /**
  * Contains the main navigation graph for PyLearn.
  */
@@ -32,8 +38,10 @@ fun PyLearnNavHost(
 
             LandingScreen(
                 uiState = uiState,
-                onTopicClick = {
-                    navController.navigate(AppDestination.Activity.route)
+                onTopicClick = { topic ->
+                    navController.navigate(
+                        AppDestination.Activity.createRoute(topic.id)
+                    )
                 },
                 onStatisticsClick = {
                     navController.navigate(AppDestination.Statistics.route)
@@ -44,8 +52,28 @@ fun PyLearnNavHost(
             )
         }
 
-        composable(route = AppDestination.Activity.route) {
+        composable(
+            route = AppDestination.Activity.route,
+            arguments = listOf(
+                navArgument(AppDestination.Activity.TOPIC_ID_ARGUMENT) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val topicId = backStackEntry.arguments
+                ?.getString(AppDestination.Activity.TOPIC_ID_ARGUMENT)
+                .orEmpty()
+
+            val activityViewModel: ActivityViewModel = viewModel()
+            val uiState by activityViewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(topicId) {
+                activityViewModel.loadTopic(topicId)
+            }
+
             ActivityScreen(
+                uiState = uiState,
                 onBackClick = {
                     navController.popBackStack()
                 }
