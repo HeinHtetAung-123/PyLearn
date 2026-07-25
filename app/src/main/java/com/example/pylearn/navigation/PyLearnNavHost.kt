@@ -9,7 +9,10 @@ import com.example.pylearn.ui.activity.ActivityScreen
 import com.example.pylearn.ui.landing.LandingScreen
 import com.example.pylearn.ui.settings.SettingsScreen
 import com.example.pylearn.ui.statistics.StatisticsScreen
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
+import com.example.pylearn.ui.landing.LandingViewModel
 /**
  * Contains the main navigation graph for PyLearn.
  */
@@ -24,8 +27,12 @@ fun PyLearnNavHost(
         modifier = modifier
     ) {
         composable(route = AppDestination.Landing.route) {
+            val landingViewModel: LandingViewModel = viewModel()
+            val uiState by landingViewModel.uiState.collectAsStateWithLifecycle()
+
             LandingScreen(
-                onActivityClick = {
+                uiState = uiState,
+                onTopicClick = {
                     navController.navigate(AppDestination.Activity.route)
                 },
                 onStatisticsClick = {
