@@ -1,0 +1,64 @@
+package com.example.pylearn.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.pylearn.ui.activity.ActivityScreen
+import com.example.pylearn.ui.landing.LandingScreen
+import com.example.pylearn.ui.settings.SettingsScreen
+import com.example.pylearn.ui.statistics.StatisticsScreen
+
+/**
+ * Contains the main navigation graph for PyLearn.
+ */
+@Composable
+fun PyLearnNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = AppDestination.Landing.route,
+        modifier = modifier
+    ) {
+        composable(route = AppDestination.Landing.route) {
+            LandingScreen(
+                onActivityClick = {
+                    navController.navigate(AppDestination.Activity.route)
+                },
+                onStatisticsClick = {
+                    navController.navigate(AppDestination.Statistics.route)
+                },
+                onSettingsClick = {
+                    navController.navigate(AppDestination.Settings.route)
+                }
+            )
+        }
+
+        composable(route = AppDestination.Activity.route) {
+            ActivityScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = AppDestination.Statistics.route) {
+            StatisticsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = AppDestination.Settings.route) {
+            SettingsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
