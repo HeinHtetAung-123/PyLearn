@@ -74,6 +74,10 @@ fun PyLearnNavHost(
 
             ActivityScreen(
                 uiState = uiState,
+                onAnswerSelected = activityViewModel::selectAnswer,
+                onSubmitAnswer = activityViewModel::submitAnswer,
+                onNextQuestion = activityViewModel::moveToNextQuestion,
+                onRestartQuiz = activityViewModel::restartQuiz,
                 onBackClick = {
                     navController.popBackStack()
                 }
