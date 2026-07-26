@@ -22,6 +22,8 @@ import com.example.pylearn.ui.settings.SettingsScreen
 import com.example.pylearn.ui.statistics.StatisticsScreen
 import com.example.pylearn.ui.statistics.StatisticsViewModel
 import com.example.pylearn.ui.statistics.StatisticsViewModelFactory
+import com.example.pylearn.ui.settings.SettingsViewModel
+import com.example.pylearn.ui.settings.SettingsViewModelFactory
 
 /**
  * Contains the main navigation graph for PyLearn.
@@ -128,7 +130,35 @@ fun PyLearnNavHost(
         }
 
         composable(route = AppDestination.Settings.route) {
+            val application =
+                LocalContext.current.applicationContext as PyLearnApplication
+
+            val settingsViewModel: SettingsViewModel = viewModel(
+                factory = SettingsViewModelFactory(
+                    settingsRepository =
+                        application.appContainer.settingsRepository,
+                    quizProgressRepository =
+                        application.appContainer.quizProgressRepository
+                )
+            )
+
+            val settingsUiState by
+            settingsViewModel.uiState.collectAsStateWithLifecycle()
+
             SettingsScreen(
+                uiState = settingsUiState,
+                onDarkModeChanged =
+                    settingsViewModel::setDarkModeEnabled,
+                onLargeTextChanged =
+                    settingsViewModel::setLargeTextEnabled,
+                onConfirmBeforeResetChanged =
+                    settingsViewModel::setConfirmBeforeReset,
+                onResetProgressClick =
+                    settingsViewModel::requestProgressReset,
+                onConfirmReset =
+                    settingsViewModel::confirmProgressReset,
+                onDismissReset =
+                    settingsViewModel::dismissResetConfirmation,
                 onBackClick = {
                     navController.popBackStack()
                 }
