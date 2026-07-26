@@ -14,7 +14,10 @@ class ActivityViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = ActivityViewModel()
+        viewModel = ActivityViewModel(
+            quizProgressRepository =
+                FakeQuizProgressRepository()
+        )
     }
 
     @Test

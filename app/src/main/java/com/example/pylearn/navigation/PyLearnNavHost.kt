@@ -19,6 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.pylearn.ui.activity.ActivityViewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.pylearn.PyLearnApplication
+import com.example.pylearn.ui.activity.ActivityViewModelFactory
 /**
  * Contains the main navigation graph for PyLearn.
  */
@@ -65,7 +68,15 @@ fun PyLearnNavHost(
                 ?.getString(AppDestination.Activity.TOPIC_ID_ARGUMENT)
                 .orEmpty()
 
-            val activityViewModel: ActivityViewModel = viewModel()
+            val application =
+                LocalContext.current.applicationContext as PyLearnApplication
+
+            val activityViewModel: ActivityViewModel = viewModel(
+                factory = ActivityViewModelFactory(
+                    quizProgressRepository =
+                        application.appContainer.quizProgressRepository
+                )
+            )
             val uiState by activityViewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(topicId) {

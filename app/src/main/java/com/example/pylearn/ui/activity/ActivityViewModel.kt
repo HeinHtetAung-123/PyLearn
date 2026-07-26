@@ -1,13 +1,18 @@
 package com.example.pylearn.ui.activity
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.pylearn.data.QuizProgressRepository
 import com.example.pylearn.data.SampleLearningData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class ActivityViewModel : ViewModel() {
+class ActivityViewModel(
+    private val quizProgressRepository: QuizProgressRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ActivityUiState())
     val uiState: StateFlow<ActivityUiState> = _uiState.asStateFlow()
@@ -17,19 +22,22 @@ class ActivityViewModel : ViewModel() {
             topic.id == topicId
         }
 
-        val topicQuestions = SampleLearningData.getQuestionsForTopic(topicId)
+        val topicQuestions =
+            SampleLearningData.getQuestionsForTopic(topicId)
 
         _uiState.value = when {
             selectedTopic == null -> {
                 ActivityUiState(
-                    errorMessage = "The selected Python topic could not be found."
+                    errorMessage =
+                        "The selected Python topic could not be found."
                 )
             }
 
             topicQuestions.isEmpty() -> {
                 ActivityUiState(
                     topic = selectedTopic,
-                    errorMessage = "No questions are currently available for this topic."
+                    errorMessage =
+                        "No questions are currently available for this topic."
                 )
             }
 
@@ -67,11 +75,16 @@ class ActivityViewModel : ViewModel() {
             return
         }
 
-        val isCorrect = selectedIndex == question.correctAnswerIndex
+        val isCorrect =
+            selectedIndex == question.correctAnswerIndex
 
         _uiState.update {
             it.copy(
-                score = if (isCorrect) it.score + 1 else it.score,
+                score = if (isCorrect) {
+                    it.score + 1
+                } else {
+                    it.score
+                },
                 isAnswerSubmitted = true
             )
         }
@@ -85,20 +98,37 @@ class ActivityViewModel : ViewModel() {
         }
 
         val isLastQuestion =
-            currentState.currentQuestionIndex == currentState.questions.lastIndex
+            currentState.currentQuestionIndex ==
+                    currentState.questions.lastIndex
 
         if (isLastQuestion) {
             _uiState.update {
                 it.copy(isQuizComplete = true)
             }
+
+            saveCompletedQuiz()
         } else {
             _uiState.update {
                 it.copy(
-                    currentQuestionIndex = it.currentQuestionIndex + 1,
+                    currentQuestionIndex =
+                        it.currentQuestionIndex + 1,
                     selectedAnswerIndex = null,
                     isAnswerSubmitted = false
                 )
             }
+        }
+    }
+
+    private fun saveCompletedQuiz() {
+        val currentState = _uiState.value
+        val topicId = currentState.topic?.id ?: return
+
+        viewModelScope.launch {
+            quizProgressRepository.saveQuizResult(
+                topicId = topicId,
+                score = currentState.score,
+                totalQuestions = currentState.totalQuestions
+            )
         }
     }
 
