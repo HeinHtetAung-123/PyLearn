@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,11 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.pylearn.domain.model.LearningQuestion
 import com.example.pylearn.domain.model.QuestionType
-import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun ActivityScreen(
@@ -33,7 +35,9 @@ fun ActivityScreen(
 ) {
     when {
         uiState.isLoading -> {
-            MessageScreen(message = "Loading activity...")
+            MessageScreen(
+                message = "Loading activity..."
+            )
         }
 
         uiState.errorMessage != null -> {
@@ -94,18 +98,27 @@ private fun QuizContent(
 
         item {
             LinearProgressIndicator(
-                progress = { uiState.progress },
+                progress = {
+                    uiState.progress
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
         item {
-            QuestionCard(question = question)
+            QuestionCard(
+                question = question
+            )
         }
 
-        items(question.options.size) { answerIndex ->
+        itemsIndexed(
+            items = question.options,
+            key = { answerIndex, _ ->
+                "${question.id}_$answerIndex"
+            }
+        ) { answerIndex, option ->
             AnswerButton(
-                text = question.options[answerIndex],
+                text = option,
                 answerIndex = answerIndex,
                 selectedAnswerIndex = uiState.selectedAnswerIndex,
                 correctAnswerIndex = question.correctAnswerIndex,
@@ -130,7 +143,10 @@ private fun QuizContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (uiState.questionNumber == uiState.totalQuestions) {
+                        text = if (
+                            uiState.questionNumber ==
+                            uiState.totalQuestions
+                        ) {
                             "Finish Activity"
                         } else {
                             "Next Question"
@@ -143,7 +159,9 @@ private fun QuizContent(
                     enabled = uiState.selectedAnswerIndex != null,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Submit Answer")
+                    Text(
+                        text = "Submit Answer"
+                    )
                 }
             }
         }
@@ -153,7 +171,9 @@ private fun QuizContent(
                 onClick = onBackClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Back to Home")
+                Text(
+                    text = "Back to Home"
+                )
             }
         }
     }
@@ -166,14 +186,14 @@ private fun QuestionCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor =
+                MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-
             Text(
                 text = when (question.questionType) {
                     QuestionType.MULTIPLE_CHOICE ->
@@ -200,7 +220,8 @@ private fun QuestionCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color =
+                                MaterialTheme.colorScheme.surfaceVariant,
                             shape = MaterialTheme.shapes.medium
                         )
                         .padding(16.dp),
@@ -223,13 +244,19 @@ private fun AnswerButton(
     onAnswerSelected: (Int) -> Unit
 ) {
     val buttonText = when {
-        isAnswerSubmitted && answerIndex == correctAnswerIndex ->
+        isAnswerSubmitted &&
+                answerIndex == correctAnswerIndex -> {
             "✓ $text"
+        }
 
-        isAnswerSubmitted && answerIndex == selectedAnswerIndex ->
+        isAnswerSubmitted &&
+                answerIndex == selectedAnswerIndex -> {
             "✗ $text"
+        }
 
-        else -> text
+        else -> {
+            text
+        }
     }
 
     OutlinedButton(
@@ -239,7 +266,9 @@ private fun AnswerButton(
         enabled = !isAnswerSubmitted,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(text = buttonText)
+        Text(
+            text = buttonText
+        )
     }
 }
 
@@ -248,7 +277,8 @@ private fun FeedbackCard(
     question: LearningQuestion,
     selectedAnswerIndex: Int?
 ) {
-    val isCorrect = selectedAnswerIndex == question.correctAnswerIndex
+    val isCorrect =
+        selectedAnswerIndex == question.correctAnswerIndex
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -293,7 +323,7 @@ private fun QuizCompleteScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(
             space = 20.dp,
-            alignment = androidx.compose.ui.Alignment.CenterVertically
+            alignment = Alignment.CenterVertically
         )
     ) {
         Text(
@@ -307,7 +337,9 @@ private fun QuizCompleteScreen(
         )
 
         Text(
-            text = "Score: ${uiState.score} out of ${uiState.totalQuestions}",
+            text =
+                "Score: ${uiState.score} out of " +
+                        "${uiState.totalQuestions}",
             style = MaterialTheme.typography.headlineSmall
         )
 
@@ -315,14 +347,18 @@ private fun QuizCompleteScreen(
             onClick = onRestartQuiz,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Try Again")
+            Text(
+                text = "Try Again"
+            )
         }
 
         OutlinedButton(
             onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Back to Home")
+            Text(
+                text = "Back to Home"
+            )
         }
     }
 }
@@ -338,7 +374,7 @@ private fun MessageScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(
             space = 16.dp,
-            alignment = androidx.compose.ui.Alignment.CenterVertically
+            alignment = Alignment.CenterVertically
         )
     ) {
         Text(
@@ -346,12 +382,14 @@ private fun MessageScreen(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        onBackClick?.let {
+        onBackClick?.let { backClick ->
             Button(
-                onClick = it,
+                onClick = backClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Back to Home")
+                Text(
+                    text = "Back to Home"
+                )
             }
         }
     }

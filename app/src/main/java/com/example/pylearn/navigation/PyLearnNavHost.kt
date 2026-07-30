@@ -16,18 +16,18 @@ import com.example.pylearn.PyLearnApplication
 import com.example.pylearn.ui.activity.ActivityScreen
 import com.example.pylearn.ui.activity.ActivityViewModel
 import com.example.pylearn.ui.activity.ActivityViewModelFactory
-import com.example.pylearn.ui.landing.LandingScreen
-import com.example.pylearn.ui.landing.LandingViewModel
-import com.example.pylearn.ui.settings.SettingsScreen
-import com.example.pylearn.ui.statistics.StatisticsScreen
-import com.example.pylearn.ui.statistics.StatisticsViewModel
-import com.example.pylearn.ui.statistics.StatisticsViewModelFactory
-import com.example.pylearn.ui.settings.SettingsViewModel
-import com.example.pylearn.ui.settings.SettingsViewModelFactory
 import com.example.pylearn.ui.coderunner.CodeRunnerScreen
 import com.example.pylearn.ui.coderunner.CodeRunnerViewModel
 import com.example.pylearn.ui.coderunner.CodeRunnerViewModelFactory
+import com.example.pylearn.ui.landing.LandingScreen
+import com.example.pylearn.ui.landing.LandingViewModel
 import com.example.pylearn.ui.landing.LandingViewModelFactory
+import com.example.pylearn.ui.settings.SettingsScreen
+import com.example.pylearn.ui.settings.SettingsViewModel
+import com.example.pylearn.ui.settings.SettingsViewModelFactory
+import com.example.pylearn.ui.statistics.StatisticsScreen
+import com.example.pylearn.ui.statistics.StatisticsViewModel
+import com.example.pylearn.ui.statistics.StatisticsViewModelFactory
 
 /**
  * Contains the main navigation graph for PyLearn.
@@ -42,7 +42,9 @@ fun PyLearnNavHost(
         startDestination = AppDestination.Landing.route,
         modifier = modifier
     ) {
-        composable(route = AppDestination.Landing.route) {
+        composable(
+            route = AppDestination.Landing.route
+        ) {
             val application =
                 LocalContext.current.applicationContext as PyLearnApplication
 
@@ -52,13 +54,17 @@ fun PyLearnNavHost(
                         application.appContainer.quizProgressRepository
                 )
             )
-            val uiState by landingViewModel.uiState.collectAsStateWithLifecycle()
+
+            val uiState by
+            landingViewModel.uiState.collectAsStateWithLifecycle()
 
             LandingScreen(
                 uiState = uiState,
                 onTopicClick = { topic ->
                     navController.navigate(
-                        AppDestination.Activity.createRoute(topic.id)
+                        AppDestination.Activity.createRoute(
+                            topic.id
+                        )
                     )
                 },
                 onStatisticsClick = {
@@ -114,29 +120,38 @@ fun PyLearnNavHost(
 
             ActivityScreen(
                 uiState = uiState,
-                onAnswerSelected = activityViewModel::selectAnswer,
-                onSubmitAnswer = activityViewModel::submitAnswer,
-                onNextQuestion = activityViewModel::moveToNextQuestion,
-                onRestartQuiz = activityViewModel::restartQuiz,
+                onAnswerSelected =
+                    activityViewModel::selectAnswer,
+                onSubmitAnswer =
+                    activityViewModel::submitAnswer,
+                onNextQuestion =
+                    activityViewModel::moveToNextQuestion,
+                onRestartQuiz =
+                    activityViewModel::restartQuiz,
                 onBackClick = {
                     navController.popBackStack()
                 }
             )
         }
 
-        composable(route = AppDestination.Statistics.route) {
+        composable(
+            route = AppDestination.Statistics.route
+        ) {
             val application =
                 LocalContext.current.applicationContext as PyLearnApplication
 
-            val statisticsViewModel: StatisticsViewModel = viewModel(
-                factory = StatisticsViewModelFactory(
-                    quizProgressRepository =
-                        application.appContainer.quizProgressRepository
+            val statisticsViewModel: StatisticsViewModel =
+                viewModel(
+                    factory = StatisticsViewModelFactory(
+                        quizProgressRepository =
+                            application.appContainer
+                                .quizProgressRepository
+                    )
                 )
-            )
 
             val statisticsUiState by
-            statisticsViewModel.uiState.collectAsStateWithLifecycle()
+            statisticsViewModel.uiState
+                .collectAsStateWithLifecycle()
 
             StatisticsScreen(
                 uiState = statisticsUiState,
@@ -146,21 +161,27 @@ fun PyLearnNavHost(
             )
         }
 
-        composable(route = AppDestination.Settings.route) {
+        composable(
+            route = AppDestination.Settings.route
+        ) {
             val application =
                 LocalContext.current.applicationContext as PyLearnApplication
 
-            val settingsViewModel: SettingsViewModel = viewModel(
-                factory = SettingsViewModelFactory(
-                    settingsRepository =
-                        application.appContainer.settingsRepository,
-                    quizProgressRepository =
-                        application.appContainer.quizProgressRepository
+            val settingsViewModel: SettingsViewModel =
+                viewModel(
+                    factory = SettingsViewModelFactory(
+                        settingsRepository =
+                            application.appContainer
+                                .settingsRepository,
+                        quizProgressRepository =
+                            application.appContainer
+                                .quizProgressRepository
+                    )
                 )
-            )
 
             val settingsUiState by
-            settingsViewModel.uiState.collectAsStateWithLifecycle()
+            settingsViewModel.uiState
+                .collectAsStateWithLifecycle()
 
             SettingsScreen(
                 uiState = settingsUiState,
@@ -182,19 +203,24 @@ fun PyLearnNavHost(
             )
         }
 
-        composable(route = AppDestination.CodeRunner.route) {
+        composable(
+            route = AppDestination.CodeRunner.route
+        ) {
             val application =
                 LocalContext.current.applicationContext as PyLearnApplication
 
-            val codeRunnerViewModel: CodeRunnerViewModel = viewModel(
-                factory = CodeRunnerViewModelFactory(
-                    codeExecutionRepository =
-                        application.appContainer.codeExecutionRepository
+            val codeRunnerViewModel: CodeRunnerViewModel =
+                viewModel(
+                    factory = CodeRunnerViewModelFactory(
+                        codeExecutionRepository =
+                            application.appContainer
+                                .codeExecutionRepository
+                    )
                 )
-            )
 
             val codeRunnerUiState by
-            codeRunnerViewModel.uiState.collectAsStateWithLifecycle()
+            codeRunnerViewModel.uiState
+                .collectAsStateWithLifecycle()
 
             CodeRunnerScreen(
                 uiState = codeRunnerUiState,
