@@ -126,6 +126,23 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "variables_5",
+            topicId = "variables",
+            questionText = "What is the data type of this value?",
+            codeSnippet = "price = 12.50",
+            options = listOf(
+                "String",
+                "Integer",
+                "Float",
+                "Boolean"
+            ),
+            correctAnswerIndex = 2,
+            explanation = "A number containing a decimal point is stored as a float in Python.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
             id = "operators_1",
             topicId = "operators",
             questionText = "What is the result of this expression?",
@@ -176,6 +193,39 @@ object SampleLearningData {
             correctAnswerIndex = 0,
             explanation = "A single equals sign assigns a value. Python uses == to compare whether two values are equal.",
             questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "operators_4",
+            topicId = "operators",
+            questionText = "What is the output?",
+            codeSnippet = "print(10 // 3)",
+            options = listOf(
+                "3",
+                "3.33",
+                "1",
+                "4"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "The // operator performs floor division and returns the whole-number result.",
+            questionType = QuestionType.PREDICT_OUTPUT,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "operators_5",
+            topicId = "operators",
+            questionText = "Which operator returns the remainder after division?",
+            options = listOf(
+                "/",
+                "//",
+                "%",
+                "**"
+            ),
+            correctAnswerIndex = 2,
+            explanation = "The modulo operator % returns the remainder after division.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
             difficulty = DifficultyLevel.BEGINNER
         ),
 
@@ -241,6 +291,48 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "conditions_4",
+            topicId = "conditions",
+            questionText = "What will this code display?",
+            codeSnippet = """
+        score = 65
+
+        if score >= 80:
+            print("High")
+        elif score >= 50:
+            print("Pass")
+        else:
+            print("Try again")
+    """.trimIndent(),
+            options = listOf(
+                "High",
+                "Pass",
+                "Try again",
+                "Nothing"
+            ),
+            correctAnswerIndex = 1,
+            explanation = "The first condition is false, but score >= 50 is true, so Pass is displayed.",
+            questionType = QuestionType.PREDICT_OUTPUT,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "conditions_5",
+            topicId = "conditions",
+            questionText = "Which value is treated as a Boolean value?",
+            options = listOf(
+                "\"True\"",
+                "True",
+                "1.5",
+                "\"False value\""
+            ),
+            correctAnswerIndex = 1,
+            explanation = "True without quotation marks is a Boolean value. Text inside quotation marks is a string.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
             id = "loops_1",
             topicId = "loops",
             questionText = "How many times will this loop run?",
@@ -292,6 +384,46 @@ object SampleLearningData {
             correctAnswerIndex = 0,
             explanation = "Statements inside a Python loop must be indented beneath the loop declaration.",
             questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "loops_4",
+            topicId = "loops",
+            questionText = "What is the output?",
+            codeSnippet = """
+        total = 0
+
+        for number in range(1, 4):
+            total = total + number
+
+        print(total)
+    """.trimIndent(),
+            options = listOf(
+                "3",
+                "6",
+                "10",
+                "123"
+            ),
+            correctAnswerIndex = 1,
+            explanation = "range(1, 4) produces 1, 2 and 3. Their sum is 6.",
+            questionType = QuestionType.PREDICT_OUTPUT,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "loops_5",
+            topicId = "loops",
+            questionText = "Which keyword immediately stops a loop?",
+            options = listOf(
+                "stop",
+                "exit",
+                "break",
+                "finish"
+            ),
+            correctAnswerIndex = 2,
+            explanation = "The break keyword ends the nearest active loop immediately.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
             difficulty = DifficultyLevel.BEGINNER
         ),
 
@@ -355,6 +487,45 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "functions_4",
+            topicId = "functions",
+            questionText = "What value is returned?",
+            codeSnippet = """
+        def square(number):
+            return number * number
+
+        result = square(5)
+        print(result)
+    """.trimIndent(),
+            options = listOf(
+                "5",
+                "10",
+                "25",
+                "55"
+            ),
+            correctAnswerIndex = 2,
+            explanation = "The function multiplies 5 by itself, so it returns 25.",
+            questionType = QuestionType.PREDICT_OUTPUT,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
+            id = "functions_5",
+            topicId = "functions",
+            questionText = "What is the purpose of a function parameter?",
+            options = listOf(
+                "To provide input to the function",
+                "To permanently store every result",
+                "To stop the program",
+                "To create a loop automatically"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "Parameters allow values to be passed into a function when it is called.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
             id = "collections_1",
             topicId = "collections",
             questionText = "Which expression accesses the first item in this list?",
@@ -403,6 +574,49 @@ object SampleLearningData {
             correctAnswerIndex = 0,
             explanation = "This list has indexes 0, 1 and 2. Accessing index 3 causes an IndexError.",
             questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
+            id = "collections_4",
+            topicId = "collections",
+            questionText = "What is the output?",
+            codeSnippet = """
+                numbers = [2, 4, 6]
+                numbers.append(8)
+                print(numbers)
+            """.trimIndent(),
+            options = listOf(
+                "[2, 4, 6]",
+                "[8, 2, 4, 6]",
+                "[2, 4, 6, 8]",
+                "8"
+            ),
+            correctAnswerIndex = 2,
+            explanation = "append adds the new item to the end of the list.",
+            questionType = QuestionType.PREDICT_OUTPUT,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
+            id = "collections_5",
+            topicId = "collections",
+            questionText = "How is the value Singapore accessed?",
+            codeSnippet = """
+                student = {
+                    "name": "Alex",
+                    "country": "Singapore"
+                }
+            """.trimIndent(),
+            options = listOf(
+                "student[\"country\"]",
+                "student[1]",
+                "student.country()",
+                "student(\"Singapore\")"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "Dictionary values are accessed using their keys inside square brackets.",
+            questionType = QuestionType.MULTIPLE_CHOICE,
             difficulty = DifficultyLevel.INTERMEDIATE
         )
     )
