@@ -15,4 +15,6 @@ sealed class AppDestination(val route: String) {
     data object Statistics : AppDestination("statistics")
 
     data object Settings : AppDestination("settings")
+
+    data object CodeRunner : AppDestination("code_runner")
 }

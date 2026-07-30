@@ -25,7 +25,8 @@ fun LandingScreen(
     uiState: LandingUiState,
     onTopicClick: (PythonTopic) -> Unit,
     onStatisticsClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onCodeRunnerClick: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -66,6 +67,15 @@ fun LandingScreen(
                 ) {
                     Text(text = "Settings")
                 }
+            }
+        }
+
+        item {
+            Button(
+                onClick = onCodeRunnerClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Open Python Code Runner")
             }
         }
 

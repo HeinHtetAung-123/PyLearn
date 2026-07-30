@@ -24,6 +24,9 @@ import com.example.pylearn.ui.statistics.StatisticsViewModel
 import com.example.pylearn.ui.statistics.StatisticsViewModelFactory
 import com.example.pylearn.ui.settings.SettingsViewModel
 import com.example.pylearn.ui.settings.SettingsViewModelFactory
+import com.example.pylearn.ui.coderunner.CodeRunnerScreen
+import com.example.pylearn.ui.coderunner.CodeRunnerViewModel
+import com.example.pylearn.ui.coderunner.CodeRunnerViewModelFactory
 
 /**
  * Contains the main navigation graph for PyLearn.
@@ -57,6 +60,11 @@ fun PyLearnNavHost(
                 onSettingsClick = {
                     navController.navigate(
                         AppDestination.Settings.route
+                    )
+                },
+                onCodeRunnerClick = {
+                    navController.navigate(
+                        AppDestination.CodeRunner.route
                     )
                 }
             )
@@ -159,6 +167,36 @@ fun PyLearnNavHost(
                     settingsViewModel::confirmProgressReset,
                 onDismissReset =
                     settingsViewModel::dismissResetConfirmation,
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = AppDestination.CodeRunner.route) {
+            val application =
+                LocalContext.current.applicationContext as PyLearnApplication
+
+            val codeRunnerViewModel: CodeRunnerViewModel = viewModel(
+                factory = CodeRunnerViewModelFactory(
+                    codeExecutionRepository =
+                        application.appContainer.codeExecutionRepository
+                )
+            )
+
+            val codeRunnerUiState by
+            codeRunnerViewModel.uiState.collectAsStateWithLifecycle()
+
+            CodeRunnerScreen(
+                uiState = codeRunnerUiState,
+                onSourceCodeChanged =
+                    codeRunnerViewModel::updateSourceCode,
+                onStandardInputChanged =
+                    codeRunnerViewModel::updateStandardInput,
+                onRunCode =
+                    codeRunnerViewModel::runCode,
+                onResetCode =
+                    codeRunnerViewModel::resetCode,
                 onBackClick = {
                     navController.popBackStack()
                 }
