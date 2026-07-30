@@ -102,6 +102,10 @@ class ActivityViewModel(
                     currentState.questions.lastIndex
 
         if (isLastQuestion) {
+            if (currentState.isQuizComplete) {
+                return
+            }
+
             _uiState.update {
                 it.copy(isQuizComplete = true)
             }
@@ -123,6 +127,14 @@ class ActivityViewModel(
         val currentState = _uiState.value
         val topicId = currentState.topic?.id ?: return
 
+        if (currentState.isResultSaved) {
+            return
+        }
+
+        _uiState.update {
+            it.copy(isResultSaved = true)
+        }
+
         viewModelScope.launch {
             quizProgressRepository.saveQuizResult(
                 topicId = topicId,
@@ -139,7 +151,8 @@ class ActivityViewModel(
                 selectedAnswerIndex = null,
                 isAnswerSubmitted = false,
                 score = 0,
-                isQuizComplete = false
+                isQuizComplete = false,
+                isResultSaved = false
             )
         }
     }

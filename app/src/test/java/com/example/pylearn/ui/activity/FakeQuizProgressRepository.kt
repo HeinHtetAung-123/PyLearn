@@ -1,27 +1,31 @@
-package com.example.pylearn.ui.activity
+package com.example.pylearn.testing
 
 import com.example.pylearn.data.QuizProgressRepository
 import com.example.pylearn.data.local.QuizProgressEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
-class FakeQuizProgressRepository :
-    QuizProgressRepository {
+class FakeQuizProgressRepository : QuizProgressRepository {
 
     private val progress =
         MutableStateFlow<List<QuizProgressEntity>>(emptyList())
 
-    override fun observeAllProgress():
-            Flow<List<QuizProgressEntity>> {
+    var saveCallCount: Int = 0
+        private set
+
+    override fun observeAllProgress(): Flow<List<QuizProgressEntity>> {
         return progress
     }
 
     override fun observeProgressForTopic(
         topicId: String
     ): Flow<QuizProgressEntity?> {
-        return MutableStateFlow(
-            progress.value.find { it.topicId == topicId }
-        )
+        return progress.map { progressRecords ->
+            progressRecords.find { record ->
+                record.topicId == topicId
+            }
+        }
     }
 
     override suspend fun saveQuizResult(
@@ -29,29 +33,53 @@ class FakeQuizProgressRepository :
         score: Int,
         totalQuestions: Int
     ) {
-        val existing =
-            progress.value.find { it.topicId == topicId }
+        saveCallCount++
 
-        val updated = QuizProgressEntity(
+        val existingProgress =
+            progress.value.find { record ->
+                record.topicId == topicId
+            }
+
+        val updatedProgress = QuizProgressEntity(
             topicId = topicId,
             bestScore = maxOf(
                 score,
-                existing?.bestScore ?: 0
+                existingProgress?.bestScore ?: 0
             ),
             totalQuestions = totalQuestions,
             attemptCount =
-                (existing?.attemptCount ?: 0) + 1,
+                (existingProgress?.attemptCount ?: 0) + 1,
             isCompleted = true,
             lastAttemptTimestamp = 0L
         )
 
         progress.value =
             progress.value
-                .filterNot { it.topicId == topicId } +
-                    updated
+                .filterNot { record ->
+                    record.topicId == topicId
+                } + updatedProgress
     }
 
     override suspend fun deleteAllProgress() {
         progress.value = emptyList()
     }
+
+    suspend fun addProgress(
+        topicId: String,
+        score: Int,
+        totalQuestions: Int
+    ) {
+        saveQuizResult(
+            topicId = topicId,
+            score = score,
+            totalQuestions = totalQuestions
+        )
+    }
+
+    fun currentProgress(): List<QuizProgressEntity> {
+        return progress.value
+    }
+
+
+
 }

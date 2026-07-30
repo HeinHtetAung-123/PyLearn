@@ -11,6 +11,7 @@ data class ActivityUiState(
     val isAnswerSubmitted: Boolean = false,
     val score: Int = 0,
     val isQuizComplete: Boolean = false,
+    val isResultSaved: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 ) {

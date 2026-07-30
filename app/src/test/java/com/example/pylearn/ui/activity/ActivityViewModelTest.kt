@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import com.example.pylearn.testing.FakeQuizProgressRepository
 
 
 class ActivityViewModelTest {
@@ -193,5 +194,37 @@ class ActivityViewModelTest {
         assertNull(state.selectedAnswerIndex)
         assertFalse(state.isAnswerSubmitted)
         assertFalse(state.isQuizComplete)
+    }
+
+    @Test
+    fun finishingQuizMultipleTimes_savesResultOnlyOnce() {
+        val fakeRepository = FakeQuizProgressRepository()
+
+        viewModel = ActivityViewModel(
+            quizProgressRepository = fakeRepository
+        )
+
+        viewModel.loadTopic("operators")
+
+        while (
+            viewModel.uiState.value.currentQuestionIndex <
+            viewModel.uiState.value.questions.lastIndex
+        ) {
+            viewModel.selectAnswer(0)
+            viewModel.submitAnswer()
+            viewModel.moveToNextQuestion()
+        }
+
+        viewModel.selectAnswer(0)
+        viewModel.submitAnswer()
+
+        viewModel.moveToNextQuestion()
+        viewModel.moveToNextQuestion()
+        viewModel.moveToNextQuestion()
+
+        assertEquals(
+            1,
+            fakeRepository.saveCallCount
+        )
     }
 }
