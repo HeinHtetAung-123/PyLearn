@@ -106,6 +106,26 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "variables_4",
+            topicId = "variables",
+            questionText = "What change fixes this code?",
+            codeSnippet = """
+                student age = 20
+                print(student age)
+            """.trimIndent(),
+            options = listOf(
+                "Replace the spaces with underscores",
+                "Put the variable name in quotation marks",
+                "Replace 20 with \"20\"",
+                "Remove the print statement"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "Python variable names cannot contain spaces. A valid name would be student_age.",
+            questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
             id = "operators_1",
             topicId = "operators",
             questionText = "What is the result of this expression?",
@@ -134,6 +154,28 @@ object SampleLearningData {
             correctAnswerIndex = 1,
             explanation = "The double equals operator checks equality. A single equals sign assigns a value.",
             questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "operators_3",
+            topicId = "operators",
+            questionText = "Why does this condition not correctly compare the two values?",
+            codeSnippet = """
+                score = 10
+        
+                if score = 10:
+                    print("Full score")
+            """.trimIndent(),
+            options = listOf(
+                "The comparison should use ==",
+                "The score must be stored as text",
+                "The if keyword should be removed",
+                "The print statement needs two equals signs"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "A single equals sign assigns a value. Python uses == to compare whether two values are equal.",
+            questionType = QuestionType.DEBUG_CODE,
             difficulty = DifficultyLevel.BEGINNER
         ),
 
@@ -177,6 +219,28 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "conditions_3",
+            topicId = "conditions",
+            questionText = "What is missing from this conditional statement?",
+            codeSnippet = """
+                age = 18
+        
+                if age >= 18
+                    print("Adult")
+            """.trimIndent(),
+            options = listOf(
+                "A colon after the condition",
+                "A semicolon after age",
+                "Quotation marks around 18",
+                "The else keyword before print"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "Python requires a colon at the end of an if condition.",
+            questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
             id = "loops_1",
             topicId = "loops",
             questionText = "How many times will this loop run?",
@@ -208,6 +272,26 @@ object SampleLearningData {
             correctAnswerIndex = 0,
             explanation = "A for loop is commonly used when iterating through a known sequence or range.",
             questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.BEGINNER
+        ),
+
+        LearningQuestion(
+            id = "loops_3",
+            topicId = "loops",
+            questionText = "Why does this loop cause an indentation error?",
+            codeSnippet = """
+                for number in range(3):
+                print(number)
+            """.trimIndent(),
+            options = listOf(
+                "The print statement must be indented",
+                "range must be written in uppercase",
+                "The loop must start from 1",
+                "The colon should be removed"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "Statements inside a Python loop must be indented beneath the loop declaration.",
+            questionType = QuestionType.DEBUG_CODE,
             difficulty = DifficultyLevel.BEGINNER
         ),
 
@@ -249,6 +333,28 @@ object SampleLearningData {
         ),
 
         LearningQuestion(
+            id = "functions_3",
+            topicId = "functions",
+            questionText = "What change makes this function return the result?",
+            codeSnippet = """
+                def multiply(a, b):
+                    a * b
+        
+                print(multiply(3, 4))
+            """.trimIndent(),
+            options = listOf(
+                "Add return before a * b",
+                "Replace def with function",
+                "Remove the parameters",
+                "Move print inside the function"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "The function calculates a value but does not return it. It should use return a * b.",
+            questionType = QuestionType.DEBUG_CODE,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
             id = "collections_1",
             topicId = "collections",
             questionText = "Which expression accesses the first item in this list?",
@@ -277,6 +383,26 @@ object SampleLearningData {
             correctAnswerIndex = 1,
             explanation = "A dictionary stores values using keys, such as student[\"name\"].",
             questionType = QuestionType.MULTIPLE_CHOICE,
+            difficulty = DifficultyLevel.INTERMEDIATE
+        ),
+
+        LearningQuestion(
+            id = "collections_3",
+            topicId = "collections",
+            questionText = "What is wrong with this list access?",
+            codeSnippet = """
+                languages = ["Python", "Java", "Kotlin"]
+                print(languages[3])
+            """.trimIndent(),
+            options = listOf(
+                "Index 3 is outside the list",
+                "Lists cannot contain strings",
+                "The print function cannot display list values",
+                "The list needs round brackets"
+            ),
+            correctAnswerIndex = 0,
+            explanation = "This list has indexes 0, 1 and 2. Accessing index 3 causes an IndexError.",
+            questionType = QuestionType.DEBUG_CODE,
             difficulty = DifficultyLevel.INTERMEDIATE
         )
     )

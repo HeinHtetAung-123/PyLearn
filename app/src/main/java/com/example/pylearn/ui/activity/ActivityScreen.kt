@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pylearn.domain.model.LearningQuestion
+import com.example.pylearn.domain.model.QuestionType
+import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun ActivityScreen(
@@ -171,6 +173,22 @@ private fun QuestionCard(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+
+            Text(
+                text = when (question.questionType) {
+                    QuestionType.MULTIPLE_CHOICE ->
+                        "Multiple Choice"
+
+                    QuestionType.PREDICT_OUTPUT ->
+                        "Predict the Output"
+
+                    QuestionType.DEBUG_CODE ->
+                        "Debug the Code"
+                },
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+
             Text(
                 text = question.questionText,
                 style = MaterialTheme.typography.titleLarge
@@ -186,7 +204,9 @@ private fun QuestionCard(
                             shape = MaterialTheme.shapes.medium
                         )
                         .padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = FontFamily.Monospace
+                    )
                 )
             }
         }
