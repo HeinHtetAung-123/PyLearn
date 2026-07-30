@@ -7,17 +7,32 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+
 
 class ActivityViewModelTest {
+
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var viewModel: ActivityViewModel
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+
         viewModel = ActivityViewModel(
             quizProgressRepository =
                 FakeQuizProgressRepository()
         )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
