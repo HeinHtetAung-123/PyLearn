@@ -27,6 +27,7 @@ import com.example.pylearn.ui.settings.SettingsViewModelFactory
 import com.example.pylearn.ui.coderunner.CodeRunnerScreen
 import com.example.pylearn.ui.coderunner.CodeRunnerViewModel
 import com.example.pylearn.ui.coderunner.CodeRunnerViewModelFactory
+import com.example.pylearn.ui.landing.LandingViewModelFactory
 
 /**
  * Contains the main navigation graph for PyLearn.
@@ -42,7 +43,15 @@ fun PyLearnNavHost(
         modifier = modifier
     ) {
         composable(route = AppDestination.Landing.route) {
-            val landingViewModel: LandingViewModel = viewModel()
+            val application =
+                LocalContext.current.applicationContext as PyLearnApplication
+
+            val landingViewModel: LandingViewModel = viewModel(
+                factory = LandingViewModelFactory(
+                    quizProgressRepository =
+                        application.appContainer.quizProgressRepository
+                )
+            )
             val uiState by landingViewModel.uiState.collectAsStateWithLifecycle()
 
             LandingScreen(

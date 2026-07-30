@@ -92,6 +92,7 @@ fun LandingScreen(
         ) { topic ->
             TopicCard(
                 topic = topic,
+                progress = uiState.progressByTopicId[topic.id],
                 onClick = {
                     onTopicClick(topic)
                 }
@@ -103,6 +104,7 @@ fun LandingScreen(
 @Composable
 private fun TopicCard(
     topic: PythonTopic,
+    progress: TopicProgressSummary?,
     onClick: () -> Unit
 ) {
     Card(
@@ -130,11 +132,48 @@ private fun TopicCard(
                 style = MaterialTheme.typography.labelMedium
             )
 
+            if (progress == null) {
+                Text(
+                    text = "Not started",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                Text(
+                    text = if (progress.isCompleted) {
+                        "Completed"
+                    } else {
+                        "In progress"
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text =
+                        "Best score: ${progress.bestScore} of " +
+                                "${progress.totalQuestions} " +
+                                "(${progress.bestScorePercentage}%)",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "Attempts: ${progress.attemptCount}",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+
             Button(
                 onClick = onClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Start Topic")
+                Text(
+                    text = if (progress == null) {
+                        "Start Topic"
+                    } else {
+                        "Practice Again"
+                    }
+                )
             }
         }
     }
