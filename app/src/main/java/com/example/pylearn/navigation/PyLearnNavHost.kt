@@ -32,6 +32,11 @@ import com.example.pylearn.ui.settings.SettingsViewModelFactory
 import com.example.pylearn.ui.statistics.StatisticsScreen
 import com.example.pylearn.ui.statistics.StatisticsViewModel
 import com.example.pylearn.ui.statistics.StatisticsViewModelFactory
+import com.example.pylearn.data.SampleLearningData
+import com.example.pylearn.ui.topicoptions.TopicOptionsScreen
+import com.example.pylearn.ui.flashcards.FlashcardScreen
+import com.example.pylearn.ui.flashcards.FlashcardUiEvent
+import com.example.pylearn.ui.flashcards.FlashcardViewModel
 
 /**
  * Contains the main navigation graph for PyLearn.
@@ -70,7 +75,7 @@ fun PyLearnNavHost(
                 uiState = uiState,
                 onTopicClick = { topic ->
                     navController.navigate(
-                        AppDestination.Activity.createRoute(
+                        AppDestination.TopicOptions.createRoute(
                             topic.id
                         )
                     )
@@ -89,6 +94,50 @@ fun PyLearnNavHost(
                     navController.navigate(
                         AppDestination.CodeRunner.route
                     )
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.TopicOptions.route,
+            arguments = listOf(
+                navArgument(
+                    AppDestination.TopicOptions.TOPIC_ID_ARGUMENT
+                ) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val topicId =
+                backStackEntry.arguments
+                    ?.getString(
+                        AppDestination.TopicOptions.TOPIC_ID_ARGUMENT
+                    )
+                    .orEmpty()
+
+            val topic =
+                SampleLearningData.topics.find {
+                    it.id == topicId
+                }
+
+            TopicOptionsScreen(
+                topic = topic,
+                onQuizClick = {
+                    navController.navigate(
+                        AppDestination.Activity.createRoute(
+                            topicId
+                        )
+                    )
+                },
+                onFlashcardsClick = {
+                    navController.navigate(
+                        AppDestination.Flashcards.createRoute(
+                            topicId
+                        )
+                    )
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -171,6 +220,79 @@ fun PyLearnNavHost(
                     activityViewModel::moveToNextQuestion,
                 onRestartQuiz =
                     activityViewModel::restartQuiz,
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.Flashcards.route,
+            arguments = listOf(
+                navArgument(
+                    AppDestination.Flashcards.TOPIC_ID_ARGUMENT
+                ) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val topicId =
+                backStackEntry.arguments
+                    ?.getString(
+                        AppDestination.Flashcards.TOPIC_ID_ARGUMENT
+                    )
+                    .orEmpty()
+
+            val flashcardViewModel: FlashcardViewModel =
+                viewModel()
+
+            val flashcardUiState by
+            flashcardViewModel.uiState
+                .collectAsStateWithLifecycle()
+
+            val userPreferences by
+            appContainer.settingsRepository
+                .userPreferences
+                .collectAsStateWithLifecycle(
+                    initialValue = UserPreferences()
+                )
+
+            val currentSoundEffectsEnabled by
+            rememberUpdatedState(
+                userPreferences.soundEffectsEnabled
+            )
+
+            LaunchedEffect(topicId) {
+                flashcardViewModel.loadTopic(topicId)
+            }
+
+            LaunchedEffect(flashcardViewModel) {
+                flashcardViewModel.events.collect { event ->
+                    val soundEffect = when (event) {
+                        FlashcardUiEvent.CardFlipped ->
+                            SoundEffect.FLASHCARD_FLIP
+
+                        FlashcardUiEvent.SessionCompleted ->
+                            SoundEffect.ACTIVITY_COMPLETE
+                    }
+
+                    appContainer.soundPlayer.play(
+                        effect = soundEffect,
+                        enabled = currentSoundEffectsEnabled
+                    )
+                }
+            }
+
+            FlashcardScreen(
+                uiState = flashcardUiState,
+                onFlipCard =
+                    flashcardViewModel::flipCard,
+                onRemembered =
+                    flashcardViewModel::markRemembered,
+                onReviewAgain =
+                    flashcardViewModel::markForReview,
+                onRestartSession =
+                    flashcardViewModel::restartSession,
                 onBackClick = {
                     navController.popBackStack()
                 }
