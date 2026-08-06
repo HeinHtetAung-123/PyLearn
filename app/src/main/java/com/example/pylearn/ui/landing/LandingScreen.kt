@@ -19,6 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pylearn.domain.model.PythonTopic
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Alignment
 
 @Composable
 fun LandingScreen(
@@ -107,60 +112,118 @@ private fun TopicCard(
     progress: TopicProgressSummary?,
     onClick: () -> Unit
 ) {
+    val isCompleted = progress?.isCompleted == true
+    val progressValue =
+        (progress?.bestScorePercentage ?: 0) / 100f
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor =
+                MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(
-                text = topic.title,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = topic.title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-            Text(
-                text = topic.description,
-                style = MaterialTheme.typography.bodyMedium
-            )
+                    Text(
+                        text = topic.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color =
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
-            Text(
-                text = "Difficulty: ${topic.difficulty.name.lowercase().replaceFirstChar { it.uppercase() }}",
-                style = MaterialTheme.typography.labelMedium
-            )
+                if (isCompleted) {
+                    Surface(
+                        shape = CircleShape,
+                        color =
+                            MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = "✓",
+                            modifier = Modifier.padding(
+                                horizontal = 10.dp,
+                                vertical = 6.dp
+                            ),
+                            style =
+                                MaterialTheme.typography.titleMedium,
+                            color =
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
 
-            if (progress == null) {
-                Text(
-                    text = "Not started",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DifficultyChip(
+                    difficulty = topic.difficulty.name
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() }
                 )
-            } else {
+
                 Text(
-                    text = if (progress.isCompleted) {
-                        "Completed"
-                    } else {
-                        "In progress"
+                    text = when {
+                        progress == null ->
+                            "Not started"
+
+                        isCompleted ->
+                            "${progress.bestScorePercentage}%"
+
+                        else ->
+                            "In progress"
                     },
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = if (isCompleted) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
+
+            if (progress != null) {
+                LinearProgressIndicator(
+                    progress = {
+                        progressValue.coerceIn(0f, 1f)
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Text(
-                    text =
-                        "Best score: ${progress.bestScore} of " +
-                                "${progress.totalQuestions} " +
-                                "(${progress.bestScorePercentage}%)",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CompactStat(
+                        label = "Best",
+                        value =
+                            "${progress.bestScore}/${progress.totalQuestions}"
+                    )
 
-                Text(
-                    text = "Attempts: ${progress.attemptCount}",
-                    style = MaterialTheme.typography.labelMedium
-                )
+                    CompactStat(
+                        label = "Attempts",
+                        value = progress.attemptCount.toString()
+                    )
+                }
             }
 
             Button(
@@ -176,5 +239,50 @@ private fun TopicCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DifficultyChip(
+    difficulty: String
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color =
+            MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Text(
+            text = difficulty,
+            modifier = Modifier.padding(
+                horizontal = 10.dp,
+                vertical = 5.dp
+            ),
+            style = MaterialTheme.typography.labelMedium,
+            color =
+                MaterialTheme.colorScheme.onSecondaryContainer
+        )
+    }
+}
+
+@Composable
+private fun CompactStat(
+    label: String,
+    value: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color =
+                MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelLarge
+        )
     }
 }
