@@ -27,6 +27,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {},
                     onConfirmReset = {},
                     onDismissReset = {},
@@ -45,6 +46,10 @@ class SettingsScreenTest {
 
         composeTestRule
             .onNodeWithText("Larger text")
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Sound effects")
             .assertIsDisplayed()
 
         composeTestRule
@@ -68,6 +73,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {},
                     onConfirmReset = {},
                     onDismissReset = {},
@@ -83,6 +89,65 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun soundEffectsOption_reflectsEnabledState() {
+        composeTestRule.setContent {
+            PyLearnTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(
+                        soundEffectsEnabled = true,
+                        isLoading = false
+                    ),
+                    onDarkModeChanged = {},
+                    onLargeTextChanged = {},
+                    onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
+                    onResetProgressClick = {},
+                    onConfirmReset = {},
+                    onDismissReset = {},
+                    onBackClick = {}
+                )
+            }
+        }
+
+        composeTestRule
+            .onAllNodesWithText("Sound effects")
+            .onFirst()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun soundEffectsSwitch_triggersCallback() {
+        var soundEffectsChanged = false
+
+        composeTestRule.setContent {
+            PyLearnTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(
+                        soundEffectsEnabled = false,
+                        isLoading = false
+                    ),
+                    onDarkModeChanged = {},
+                    onLargeTextChanged = {},
+                    onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {
+                        soundEffectsChanged = true
+                    },
+                    onResetProgressClick = {},
+                    onConfirmReset = {},
+                    onDismissReset = {},
+                    onBackClick = {}
+                )
+            }
+        }
+
+        composeTestRule
+            .onNodeWithText("Sound effects")
+            .performClick()
+
+        assertTrue(soundEffectsChanged)
+    }
+
+    @Test
     fun resetButton_triggersResetRequest() {
         var resetRequested = false
 
@@ -95,6 +160,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {
                         resetRequested = true
                     },
@@ -124,6 +190,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {},
                     onConfirmReset = {},
                     onDismissReset = {},
@@ -159,6 +226,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {},
                     onConfirmReset = {
                         resetConfirmed = true
@@ -190,6 +258,7 @@ class SettingsScreenTest {
                     onDarkModeChanged = {},
                     onLargeTextChanged = {},
                     onConfirmBeforeResetChanged = {},
+                    onSoundEffectsChanged = {},
                     onResetProgressClick = {},
                     onConfirmReset = {},
                     onDismissReset = {

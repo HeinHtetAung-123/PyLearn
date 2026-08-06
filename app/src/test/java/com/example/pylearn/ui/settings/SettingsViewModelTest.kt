@@ -145,4 +145,22 @@ class SettingsViewModelTest {
 
         collectionJob.cancel()
     }
+
+    @Test
+    fun disablingSoundEffects_updatesUiState() = runTest {
+        val collectionJob = backgroundScope.launch(
+            UnconfinedTestDispatcher(testScheduler)
+        ) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.setSoundEffectsEnabled(false)
+        advanceUntilIdle()
+
+        assertFalse(
+            viewModel.uiState.value.soundEffectsEnabled
+        )
+
+        collectionJob.cancel()
+    }
 }

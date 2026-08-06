@@ -29,6 +29,7 @@ fun SettingsScreen(
     onDarkModeChanged: (Boolean) -> Unit,
     onLargeTextChanged: (Boolean) -> Unit,
     onConfirmBeforeResetChanged: (Boolean) -> Unit,
+    onSoundEffectsChanged: (Boolean) -> Unit,
     onResetProgressClick: () -> Unit,
     onConfirmReset: () -> Unit,
     onDismissReset: () -> Unit,
@@ -69,6 +70,16 @@ fun SettingsScreen(
             Text(
                 text = "Appearance and accessibility",
                 style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+        item {
+            SettingSwitchCard(
+                title = "Sound effects",
+                description =
+                    "Play subtle sounds for answers and activity completion.",
+                checked = uiState.soundEffectsEnabled,
+                onCheckedChange = onSoundEffectsChanged
             )
         }
 

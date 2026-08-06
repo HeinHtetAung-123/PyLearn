@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pylearn.data.QuizProgressRepository
 import com.example.pylearn.data.SampleLearningData
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,13 +17,25 @@ class ActivityViewModel(
     private val quizProgressRepository: QuizProgressRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ActivityUiState())
-    val uiState: StateFlow<ActivityUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(ActivityUiState())
+
+    val uiState: StateFlow<ActivityUiState> =
+        _uiState.asStateFlow()
+
+    private val _events =
+        MutableSharedFlow<ActivityUiEvent>(
+            extraBufferCapacity = 1
+        )
+
+    val events: SharedFlow<ActivityUiEvent> =
+        _events.asSharedFlow()
 
     fun loadTopic(topicId: String) {
-        val selectedTopic = SampleLearningData.topics.find { topic ->
-            topic.id == topicId
-        }
+        val selectedTopic =
+            SampleLearningData.topics.find { topic ->
+                topic.id == topicId
+            }
 
         val topicQuestions =
             SampleLearningData.getQuestionsForTopic(topicId)
@@ -51,12 +66,24 @@ class ActivityViewModel(
     }
 
     fun selectAnswer(answerIndex: Int) {
-        if (_uiState.value.isAnswerSubmitted) {
+        val currentState = _uiState.value
+
+        if (
+            currentState.isAnswerSubmitted ||
+            currentState.isQuizComplete
+        ) {
             return
         }
 
-        _uiState.update { currentState ->
-            currentState.copy(
+        val currentQuestion =
+            currentState.currentQuestion ?: return
+
+        if (answerIndex !in currentQuestion.options.indices) {
+            return
+        }
+
+        _uiState.update {
+            it.copy(
                 selectedAnswerIndex = answerIndex
             )
         }
@@ -64,28 +91,38 @@ class ActivityViewModel(
 
     fun submitAnswer() {
         val currentState = _uiState.value
-        val question = currentState.currentQuestion
-        val selectedIndex = currentState.selectedAnswerIndex
 
         if (
-            question == null ||
-            selectedIndex == null ||
-            currentState.isAnswerSubmitted
+            currentState.selectedAnswerIndex == null ||
+            currentState.isAnswerSubmitted ||
+            currentState.isQuizComplete
         ) {
             return
         }
 
-        val isCorrect =
-            selectedIndex == question.correctAnswerIndex
+        val currentQuestion =
+            currentState.currentQuestion ?: return
 
-        _uiState.update {
-            it.copy(
-                score = if (isCorrect) {
-                    it.score + 1
-                } else {
-                    it.score
-                },
-                isAnswerSubmitted = true
+        val isCorrect =
+            currentState.selectedAnswerIndex ==
+                    currentQuestion.correctAnswerIndex
+
+        _uiState.value = currentState.copy(
+            isAnswerSubmitted = true,
+            score = if (isCorrect) {
+                currentState.score + 1
+            } else {
+                currentState.score
+            }
+        )
+
+        if (isCorrect) {
+            _events.tryEmit(
+                ActivityUiEvent.CorrectAnswer
+            )
+        } else {
+            _events.tryEmit(
+                ActivityUiEvent.IncorrectAnswer
             )
         }
     }
@@ -93,7 +130,10 @@ class ActivityViewModel(
     fun moveToNextQuestion() {
         val currentState = _uiState.value
 
-        if (!currentState.isAnswerSubmitted) {
+        if (
+            !currentState.isAnswerSubmitted ||
+            currentState.isQuizComplete
+        ) {
             return
         }
 
@@ -102,13 +142,15 @@ class ActivityViewModel(
                     currentState.questions.lastIndex
 
         if (isLastQuestion) {
-            if (currentState.isQuizComplete) {
-                return
+            _uiState.update {
+                it.copy(
+                    isQuizComplete = true
+                )
             }
 
-            _uiState.update {
-                it.copy(isQuizComplete = true)
-            }
+            _events.tryEmit(
+                ActivityUiEvent.ActivityCompleted
+            )
 
             saveCompletedQuiz()
         } else {
@@ -125,21 +167,26 @@ class ActivityViewModel(
 
     private fun saveCompletedQuiz() {
         val currentState = _uiState.value
-        val topicId = currentState.topic?.id ?: return
+
+        val topicId =
+            currentState.topic?.id ?: return
 
         if (currentState.isResultSaved) {
             return
         }
 
         _uiState.update {
-            it.copy(isResultSaved = true)
+            it.copy(
+                isResultSaved = true
+            )
         }
 
         viewModelScope.launch {
             quizProgressRepository.saveQuizResult(
                 topicId = topicId,
                 score = currentState.score,
-                totalQuestions = currentState.totalQuestions
+                totalQuestions =
+                    currentState.totalQuestions
             )
         }
     }

@@ -15,4 +15,9 @@ class PyLearnApplication : Application() {
             context = this
         )
     }
+
+    override fun onTerminate() {
+        appContainer.soundPlayer.release()
+        super.onTerminate()
+    }
 }

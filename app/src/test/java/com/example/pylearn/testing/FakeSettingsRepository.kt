@@ -33,4 +33,13 @@ class FakeSettingsRepository : SettingsRepository {
                 confirmBeforeReset = enabled
             )
     }
+
+    override suspend fun setSoundEffectsEnabled(
+        enabled: Boolean
+    ) {
+        preferences.value =
+            preferences.value.copy(
+                soundEffectsEnabled = enabled
+            )
+    }
 }

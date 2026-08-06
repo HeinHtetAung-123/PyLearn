@@ -3,6 +3,7 @@ package com.example.pylearn.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,7 +14,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.pylearn.PyLearnApplication
+import com.example.pylearn.audio.SoundEffect
+import com.example.pylearn.domain.model.UserPreferences
 import com.example.pylearn.ui.activity.ActivityScreen
+import com.example.pylearn.ui.activity.ActivityUiEvent
 import com.example.pylearn.ui.activity.ActivityViewModel
 import com.example.pylearn.ui.activity.ActivityViewModelFactory
 import com.example.pylearn.ui.coderunner.CodeRunnerScreen
@@ -37,6 +41,11 @@ fun PyLearnNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val application =
+        LocalContext.current.applicationContext as PyLearnApplication
+
+    val appContainer = application.appContainer
+
     NavHost(
         navController = navController,
         startDestination = AppDestination.Landing.route,
@@ -45,18 +54,17 @@ fun PyLearnNavHost(
         composable(
             route = AppDestination.Landing.route
         ) {
-            val application =
-                LocalContext.current.applicationContext as PyLearnApplication
-
-            val landingViewModel: LandingViewModel = viewModel(
-                factory = LandingViewModelFactory(
-                    quizProgressRepository =
-                        application.appContainer.quizProgressRepository
+            val landingViewModel: LandingViewModel =
+                viewModel(
+                    factory = LandingViewModelFactory(
+                        quizProgressRepository =
+                            appContainer.quizProgressRepository
+                    )
                 )
-            )
 
             val uiState by
-            landingViewModel.uiState.collectAsStateWithLifecycle()
+            landingViewModel.uiState
+                .collectAsStateWithLifecycle()
 
             LandingScreen(
                 uiState = uiState,
@@ -95,27 +103,62 @@ fun PyLearnNavHost(
                 }
             )
         ) { backStackEntry ->
-            val topicId = backStackEntry.arguments
-                ?.getString(
-                    AppDestination.Activity.TOPIC_ID_ARGUMENT
-                )
-                .orEmpty()
+            val topicId =
+                backStackEntry.arguments
+                    ?.getString(
+                        AppDestination.Activity.TOPIC_ID_ARGUMENT
+                    )
+                    .orEmpty()
 
-            val application =
-                LocalContext.current.applicationContext as PyLearnApplication
-
-            val activityViewModel: ActivityViewModel = viewModel(
-                factory = ActivityViewModelFactory(
-                    quizProgressRepository =
-                        application.appContainer.quizProgressRepository
+            val activityViewModel: ActivityViewModel =
+                viewModel(
+                    factory = ActivityViewModelFactory(
+                        quizProgressRepository =
+                            appContainer.quizProgressRepository
+                    )
                 )
-            )
 
             val uiState by
-            activityViewModel.uiState.collectAsStateWithLifecycle()
+            activityViewModel.uiState
+                .collectAsStateWithLifecycle()
+
+            val userPreferences by
+            appContainer.settingsRepository
+                .userPreferences
+                .collectAsStateWithLifecycle(
+                    initialValue = UserPreferences()
+                )
+
+            val currentSoundEffectsEnabled by
+            rememberUpdatedState(
+                userPreferences.soundEffectsEnabled
+            )
 
             LaunchedEffect(topicId) {
                 activityViewModel.loadTopic(topicId)
+            }
+
+            LaunchedEffect(activityViewModel) {
+                activityViewModel.events.collect { event ->
+                    val soundEffect = when (event) {
+                        ActivityUiEvent.CorrectAnswer -> {
+                            SoundEffect.CORRECT_ANSWER
+                        }
+
+                        ActivityUiEvent.IncorrectAnswer -> {
+                            SoundEffect.INCORRECT_ANSWER
+                        }
+
+                        ActivityUiEvent.ActivityCompleted -> {
+                            SoundEffect.ACTIVITY_COMPLETE
+                        }
+                    }
+
+                    appContainer.soundPlayer.play(
+                        effect = soundEffect,
+                        enabled = currentSoundEffectsEnabled
+                    )
+                }
             }
 
             ActivityScreen(
@@ -137,15 +180,11 @@ fun PyLearnNavHost(
         composable(
             route = AppDestination.Statistics.route
         ) {
-            val application =
-                LocalContext.current.applicationContext as PyLearnApplication
-
             val statisticsViewModel: StatisticsViewModel =
                 viewModel(
                     factory = StatisticsViewModelFactory(
                         quizProgressRepository =
-                            application.appContainer
-                                .quizProgressRepository
+                            appContainer.quizProgressRepository
                     )
                 )
 
@@ -164,18 +203,13 @@ fun PyLearnNavHost(
         composable(
             route = AppDestination.Settings.route
         ) {
-            val application =
-                LocalContext.current.applicationContext as PyLearnApplication
-
             val settingsViewModel: SettingsViewModel =
                 viewModel(
                     factory = SettingsViewModelFactory(
                         settingsRepository =
-                            application.appContainer
-                                .settingsRepository,
+                            appContainer.settingsRepository,
                         quizProgressRepository =
-                            application.appContainer
-                                .quizProgressRepository
+                            appContainer.quizProgressRepository
                     )
                 )
 
@@ -191,6 +225,8 @@ fun PyLearnNavHost(
                     settingsViewModel::setLargeTextEnabled,
                 onConfirmBeforeResetChanged =
                     settingsViewModel::setConfirmBeforeReset,
+                onSoundEffectsChanged =
+                    settingsViewModel::setSoundEffectsEnabled,
                 onResetProgressClick =
                     settingsViewModel::requestProgressReset,
                 onConfirmReset =
@@ -206,15 +242,11 @@ fun PyLearnNavHost(
         composable(
             route = AppDestination.CodeRunner.route
         ) {
-            val application =
-                LocalContext.current.applicationContext as PyLearnApplication
-
             val codeRunnerViewModel: CodeRunnerViewModel =
                 viewModel(
                     factory = CodeRunnerViewModelFactory(
                         codeExecutionRepository =
-                            application.appContainer
-                                .codeExecutionRepository
+                            appContainer.codeExecutionRepository
                     )
                 )
 

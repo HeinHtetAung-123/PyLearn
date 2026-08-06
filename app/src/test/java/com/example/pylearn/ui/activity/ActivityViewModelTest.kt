@@ -1,5 +1,15 @@
 package com.example.pylearn.ui.activity
 
+import com.example.pylearn.testing.FakeQuizProgressRepository
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -7,12 +17,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import com.example.pylearn.testing.FakeQuizProgressRepository
 
 
 class ActivityViewModelTest {
@@ -227,4 +231,58 @@ class ActivityViewModelTest {
             fakeRepository.saveCallCount
         )
     }
+    @Test
+    fun submittingCorrectAnswer_emitsCorrectSoundEvent() =
+        runTest {
+            viewModel.loadTopic("variables")
+
+            val eventDeferred = async(
+                start = CoroutineStart.UNDISPATCHED
+            ) {
+                viewModel.events.first()
+            }
+
+            val correctIndex =
+                viewModel.uiState.value
+                    .currentQuestion
+                    ?.correctAnswerIndex
+                    ?: error("Question was not loaded")
+
+            viewModel.selectAnswer(correctIndex)
+            viewModel.submitAnswer()
+
+            assertEquals(
+                ActivityUiEvent.CorrectAnswer,
+                eventDeferred.await()
+            )
+        }
+
+    @Test
+    fun submittingIncorrectAnswer_emitsIncorrectSoundEvent() =
+        runTest {
+            viewModel.loadTopic("variables")
+
+            val eventDeferred = async(
+                start = CoroutineStart.UNDISPATCHED
+            ) {
+                viewModel.events.first()
+            }
+
+            val question =
+                viewModel.uiState.value.currentQuestion
+                    ?: error("Question was not loaded")
+
+            val incorrectIndex =
+                question.options.indices.first { index ->
+                    index != question.correctAnswerIndex
+                }
+
+            viewModel.selectAnswer(incorrectIndex)
+            viewModel.submitAnswer()
+
+            assertEquals(
+                ActivityUiEvent.IncorrectAnswer,
+                eventDeferred.await()
+            )
+        }
 }

@@ -21,6 +21,9 @@ interface SettingsRepository {
     suspend fun setLargeTextEnabled(enabled: Boolean)
 
     suspend fun setConfirmBeforeReset(enabled: Boolean)
+
+
+    suspend fun setSoundEffectsEnabled(enabled: Boolean)
 }
 
 class DataStoreSettingsRepository(
@@ -36,6 +39,9 @@ class DataStoreSettingsRepository(
 
         val confirmBeforeReset =
             booleanPreferencesKey("confirm_before_reset")
+
+        val soundEffectsEnabled =
+            booleanPreferencesKey("sound_effects_enabled")
     }
 
     override val userPreferences: Flow<UserPreferences> =
@@ -46,7 +52,9 @@ class DataStoreSettingsRepository(
                 largeTextEnabled =
                     preferences[PreferenceKeys.largeTextEnabled] ?: false,
                 confirmBeforeReset =
-                    preferences[PreferenceKeys.confirmBeforeReset] ?: true
+                    preferences[PreferenceKeys.confirmBeforeReset] ?: true,
+                soundEffectsEnabled =
+                    preferences[PreferenceKeys.soundEffectsEnabled] ?: true
             )
         }
 
@@ -65,6 +73,14 @@ class DataStoreSettingsRepository(
     override suspend fun setConfirmBeforeReset(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[PreferenceKeys.confirmBeforeReset] = enabled
+        }
+    }
+
+    override suspend fun setSoundEffectsEnabled(
+        enabled: Boolean
+    ) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PreferenceKeys.soundEffectsEnabled] = enabled
         }
     }
 }

@@ -26,6 +26,7 @@ class SettingsViewModel(
             darkModeEnabled = preferences.darkModeEnabled,
             largeTextEnabled = preferences.largeTextEnabled,
             confirmBeforeReset = preferences.confirmBeforeReset,
+            soundEffectsEnabled = preferences.soundEffectsEnabled,
             showResetConfirmation = showDialog,
             isLoading = false
         )
@@ -75,6 +76,12 @@ class SettingsViewModel(
     private fun resetProgress() {
         viewModelScope.launch {
             quizProgressRepository.deleteAllProgress()
+        }
+    }
+
+    fun setSoundEffectsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setSoundEffectsEnabled(enabled)
         }
     }
 }

@@ -10,6 +10,8 @@ import com.example.pylearn.data.RoomQuizProgressRepository
 import com.example.pylearn.data.SettingsRepository
 import com.example.pylearn.data.local.PyLearnDatabase
 import com.example.pylearn.data.remote.Judge0ApiClient
+import com.example.pylearn.audio.AndroidSoundPlayer
+import com.example.pylearn.audio.SoundPlayer
 
 class AppContainer(
     context: Context
@@ -37,5 +39,10 @@ class AppContainer(
     val codeExecutionRepository: CodeExecutionRepository =
         Judge0CodeExecutionRepository(
             judge0Api = Judge0ApiClient.api
+        )
+
+    val soundPlayer: SoundPlayer =
+        AndroidSoundPlayer(
+            context = applicationContext
         )
 }
